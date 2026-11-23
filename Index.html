@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Laporan Part Bekas</title>
+<style>
+  :root{
+    --navy:#0f2d52; --navy2:#173f6e; --accent:#f28c28; --bg:#eef2f7; --card:#fff;
+    --ink:#1b2430; --muted:#6b7686; --line:#dde3ec;
+    --ok:#15803d; --okbg:#dcf5e5; --warn:#a16207; --warnbg:#fff4cc;
+    --bad:#b91c1c; --badbg:#fde2e2; --org:#c2410c; --orgbg:#ffe8d4;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header.top{position:sticky;top:0;z-index:20;background:var(--navy);color:#fff;padding:14px 16px 12px;
+    padding-top:calc(14px + env(safe-area-inset-top));box-shadow:0 2px 10px rgba(0,0,0,.15)}
+  .brand{font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+  .sub{font-size:12.5px;opacity:.8;margin-top:2px}
+  main{max-width:680px;margin:0 auto;padding:14px 12px 110px}
+  .tab{display:none}.tab.active{display:block}
+  .card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;border:1px solid var(--line)}
+  .card h3{margin:0 0 10px;font-size:15px;display:flex;align-items:center;gap:8px}
+  .step{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:700}
+  label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 4px;font-weight:600}
+  input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff;color:var(--ink)}
+  input:focus,select:focus,textarea:focus{outline:2px solid #9cc0ea;border-color:#6f9fd6}
+  textarea{min-height:70px;resize:vertical}
+  .row{display:flex;gap:8px}.row>*{flex:1}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:11px;padding:12px 14px;
+    font:600 15px/1 inherit;font-family:inherit;cursor:pointer;background:var(--navy);color:#fff;width:100%}
+  .btn.sec{background:#e7edf5;color:var(--navy)}
+  .btn.acc{background:var(--accent);color:#fff}
+  .btn.ok{background:var(--ok)}.btn.bad{background:var(--bad)}
+  .btn.sm{padding:9px 10px;font-size:13.5px;width:auto}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .camera{border:2px dashed #b9c6d8;border-radius:12px;padding:14px;text-align:center;background:#f7f9fc;cursor:pointer}
+  .camera img{max-width:100%;max-height:260px;border-radius:8px;display:block;margin:0 auto}
+  .camera .hint{color:var(--muted);font-size:13px}
+  .auto{background:#eef8ff;border-color:#8ec1ef}
+  .autotag{font-size:11px;font-weight:600;color:#1769aa;background:#dcefff;border-radius:6px;padding:1px 6px;margin-left:6px}
+  .manualtag{font-size:11px;font-weight:600;color:var(--warn);background:var(--warnbg);border-radius:6px;padding:1px 6px;margin-left:6px}
+  .alert{border-radius:10px;padding:10px 12px;font-size:13.5px;margin-top:10px}
+  .alert.warn{background:var(--warnbg);color:#6b4a00}.alert.bad{background:var(--badbg);color:#7f1d1d}.alert.ok{background:var(--okbg);color:#14532d}
+  .part{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;position:relative}
+  .part .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .part .num{font-weight:700;color:var(--navy)}
+  .del{background:none;border:0;color:var(--bad);font-size:13px;font-weight:600;cursor:pointer}
+  .pphoto{display:flex;gap:10px;align-items:center;margin-top:10px}
+  .thumb{width:84px;height:84px;border-radius:10px;object-fit:cover;background:#e9eef5;flex:none;border:1px solid var(--line)}
+  .thumb.empty{display:grid;place-items:center;color:#9aa6b6;font-size:26px}
+  .badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+  .b-ok{background:var(--okbg);color:var(--ok)}.b-warn{background:var(--warnbg);color:var(--warn)}
+  .b-bad{background:var(--badbg);color:var(--bad)}.b-org{background:var(--orgbg);color:var(--org)}.b-info{background:#e2eefc;color:#1d4f8f}
+  .checklist{list-style:none;padding:0;margin:0}
+  .checklist li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+  .checklist li:last-child{border:0}
+  .ck{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;flex:none}
+  .ck.y{background:var(--ok);color:#fff}.ck.n{background:#e5e9f0;color:#98a3b3}
+  .meter{height:10px;background:#e5e9f0;border-radius:99px;overflow:hidden;margin:6px 0 2px}
+  .meter>i{display:block;height:100%;background:var(--ok);transition:width .3s}
+  .sig{border:1px solid var(--line);border-radius:10px;background:#fbfcfe;touch-action:none;width:100%;height:150px;display:block}
+  .sigbar{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:12.5px;color:var(--muted)}
+  .item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer}
+  .item .t{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+  .item .id{font-weight:700;color:var(--navy)}
+  .item .meta{color:var(--muted);font-size:13px;margin-top:4px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+  .stat small{display:block;font-size:10.5px;margin-top:2px;color:var(--muted)}
+  .b-pur{background:#ede9fe;color:#5b21b6}
+  .datebox{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+  .datebox>div{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fafbfd}
+  .datebox .l{font-size:11.5px;color:var(--muted);font-weight:600}.datebox .v{font-weight:800;font-size:15px;color:var(--navy)}
+  .sect{display:flex;align-items:center;gap:8px;margin:14px 4px 8px;font-weight:700;color:var(--navy)}
+  .sect .badge{margin-left:auto}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center}
+  .stat b{display:block;font-size:20px}.stat span{font-size:11.5px;color:var(--muted)}
+  .kv{display:grid;grid-template-columns:110px 1fr;gap:4px 10px;font-size:14px}
+  .kv div:nth-child(odd){color:var(--muted)}
+  .pcheck{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+  .pcheck.yes{border-color:#86d3a2;background:#f4fbf6}.pcheck.no{border-color:#f2a5a5;background:#fff7f7}
+  .pcheck img{width:100%;max-height:280px;object-fit:contain;border-radius:8px;background:#eef1f6;margin:8px 0}
+  .seg{display:flex;gap:8px}.seg .btn{flex:1}
+  .seg .btn.on-yes{background:var(--ok);color:#fff}.seg .btn.on-no{background:var(--bad);color:#fff}
+  nav.bottom{position:fixed;bottom:0;left:0;right:0;z-index:20;background:#fff;border-top:1px solid var(--line);
+    display:flex;padding-bottom:env(safe-area-inset-bottom)}
+  nav.bottom button{flex:1;border:0;background:none;padding:10px 4px 9px;font:600 12px inherit;font-family:inherit;color:var(--muted);cursor:pointer;position:relative}
+  nav.bottom button .ic{display:block;font-size:21px;line-height:1.1;margin-bottom:2px}
+  nav.bottom button.active{color:var(--navy)}
+  nav.bottom button.active::before{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;border-radius:0 0 3px 3px;background:var(--accent)}
+  .pill{position:absolute;top:6px;left:calc(50% + 8px);background:var(--bad);color:#fff;border-radius:99px;font-size:10.5px;padding:1px 6px;display:none}
+  #overlay{position:fixed;inset:0;background:rgba(15,45,82,.55);display:none;place-items:center;z-index:50}
+  #overlay .box{background:#fff;border-radius:14px;padding:20px 22px;text-align:center;min-width:220px;max-width:80vw}
+  .spin{width:34px;height:34px;border-radius:50%;border:4px solid #dbe5f1;border-top-color:var(--navy);animation:sp 1s linear infinite;margin:0 auto 10px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  #toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:#1b2430;color:#fff;padding:10px 16px;border-radius:10px;
+    font-size:14px;z-index:60;display:none;max-width:90vw;text-align:center}
+  .modal{position:fixed;inset:0;background:var(--bg);z-index:40;overflow:auto;display:none}
+  .modal .mhead{position:sticky;top:0;background:var(--navy);color:#fff;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top));display:flex;align-items:center;gap:10px;z-index:2}
+  .modal .mhead button{background:rgba(255,255,255,.15);border:0;color:#fff;border-radius:8px;padding:6px 10px;font:600 14px inherit;font-family:inherit;cursor:pointer}
+  .modal .mbody{max-width:680px;margin:0 auto;padding:14px 12px 40px}
+  .muted{color:var(--muted);font-size:13px}
+  .empty{text-align:center;color:var(--muted);padding:30px 10px}
+  .imgbox{width:100%;min-height:80px;border-radius:8px;background:#eef1f6;display:grid;place-items:center;color:#9aa6b6;font-size:13px;margin:8px 0}
+  .imgbox img{width:100%;max-height:320px;object-fit:contain;border-radius:8px;display:block}
+  .hide{display:none!important}
+  details.ocr summary{cursor:pointer;color:var(--muted);font-size:12.5px;margin-top:8px}
+  details.ocr pre{white-space:pre-wrap;font-size:12px;background:#f5f7fa;padding:8px;border-radius:8px;max-height:160px;overflow:auto}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="dot"></span><span id="appName">Laporan Part Bekas</span></div>
+  <div class="sub" id="subTitle">Pelaporan teknisi → serah terima PIC</div>
+</header>
+
+<main>
+<!-- ===================== TAB LAPOR (TEKNISI) ===================== -->
+<section id="tab-lapor" class="tab active">
+  <div class="card">
+    <h3><span class="step">1</span>Identitas</h3>
+    <label for="fTeknisi">Nama Teknisi</label>
+    <select id="fTeknisi"><option value="">— pilih teknisi —</option></select>
+    <label for="fPic">Serahkan ke PIC</label>
+    <select id="fPic"><option value="">— pilih PIC —</option></select>
+  </div>
+
+  <div class="card">
+    <h3><span class="step">2</span>Foto SPK <span class="muted" style="font-weight:400">(data terisi otomatis)</span></h3>
+    <div class="camera" id="spkCam">
+      <div id="spkEmpty"><div style="font-size:34px">📄📷</div><b>Ketuk untuk foto SPK</b><div class="hint">Foto lurus, terang, dan seluruh kertas terlihat</div></div>
+      <img id="spkImg" class="hide" alt="Foto SPK">
+    </div>
+    <input type="file" id="spkFile" accept="image/*" capture="environment" class="hide">
+    <div id="spkStatus"></div>
+    <label for="fSpk">No. SPK <span id="tagSpk"></span></label>
+    <input id="fSpk" placeholder="Terisi otomatis dari foto SPK" autocomplete="off">
+    <div class="row">
+      <div><label for="fNopol">No. Polisi <span id="tagNopol"></span></label>
+        <input id="fNopol" placeholder="B 1234 XYZ" autocomplete="off" style="text-transform:uppercase"></div>
+      <div><label for="fType">Type Mobil <span id="tagType"></span></label>
+        <input id="fType" list="typeList" placeholder="Avanza" autocomplete="off"><datalist id="typeList"></datalist></div>
+    </div>
+    <div id="dupWarn"></div>
+    <details class="ocr hide" id="ocrBox"><summary>Lihat teks hasil baca SPK</summary><pre id="ocrText"></pre></details>
+  </div>
+
+  <div class="card">
+    <h3><span class="step">3</span>Part Bekas <span id="partBadge" class="badge b-info" style="margin-left:auto">0 part</span></h3>
+    <div id="partList"></div>
+    <button class="btn sec" id="addPart" type="button">＋ Tambah Part</button>
+  </div>
+
+  <div class="card">
+    <h3><span class="step">4</span>Serah Terima Teknisi</h3>
+    <label for="fCatatan">Catatan (opsional)</label>
+    <textarea id="fCatatan" placeholder="mis. part disimpan di rak B2"></textarea>
+    <label>Tanda tangan teknisi (diserahkan oleh)</label>
+    <canvas id="sigTek" class="sig"></canvas>
+    <div class="sigbar"><span>Tanda tangan di dalam kotak</span><button class="btn sec sm" type="button" id="clrTek">Hapus</button></div>
+  </div>
+
+  <div class="card">
+    <h3>✅ Indikator Kelengkapan</h3>
+    <div class="meter"><i id="meterBar" style="width:0%"></i></div>
+    <div class="muted" id="meterText">0% lengkap</div>
+    <ul class="checklist" id="checklist"></ul>
+  </div>
+
+  <button class="btn acc" id="btnSubmit" disabled>📤 Kirim Laporan ke PIC</button>
+</section>
+
+<!-- ===================== TAB SERAH TERIMA (PIC) ===================== -->
+<section id="tab-pic" class="tab">
+  <div class="card" id="picLogin">
+    <h3>🔐 Masuk sebagai PIC</h3>
+    <label for="lPic">Nama PIC</label>
+    <select id="lPic"><option value="">— pilih PIC —</option></select>
+    <label for="lPin">PIN</label>
+    <input id="lPin" type="password" inputmode="numeric" placeholder="••••">
+    <div style="height:12px"></div>
+    <button class="btn" id="btnLogin">Masuk</button>
+  </div>
+  <div id="picArea" class="hide">
+    <div class="card" style="display:flex;align-items:center;gap:10px">
+      <div style="flex:1"><div class="muted">Login sebagai</div><b id="picName"></b></div>
+      <button class="btn sec sm" id="btnRefreshPic">↻ Muat ulang</button>
+      <button class="btn sec sm" id="btnLogout">Keluar</button>
+    </div>
+    <div class="sect">📥 Menunggu Serah Terima dari Teknisi <span class="badge b-warn" id="cntPending">0</span></div>
+    <div id="pendingList"></div>
+    <div class="sect">🗓️ Perlu Planning Antar ke Asuransi <span class="badge b-warn" id="cntPlan">0</span></div>
+    <div id="planList"></div>
+    <div class="sect">🚚 Jadwal Antar ke Asuransi <span class="badge b-pur" id="cntDeliver">0</span></div>
+    <div id="deliverList"></div>
+  </div>
+</section>
+
+<!-- ===================== TAB RIWAYAT ===================== -->
+<section id="tab-riwayat" class="tab">
+  <div class="stats" id="stats"></div>
+  <div class="card" style="padding:10px">
+    <input id="qSearch" placeholder="🔎 Cari SPK / No. Polisi / teknisi / asuransi / klaim">
+  </div>
+  <div id="histList"></div>
+</section>
+</main>
+
+<nav class="bottom">
+  <button data-tab="lapor" class="active"><span class="ic">📝</span>Lapor</button>
+  <button data-tab="pic"><span class="ic">🤝</span>Serah Terima<span class="pill" id="pendPill"></span></button>
+  <button data-tab="riwayat"><span class="ic">📊</span>Riwayat</button>
+</nav>
+
+<!-- Modal detail -->
+<div class="modal" id="modal">
+  <div class="mhead"><button id="mClose">← Kembali</button><b id="mTitle">Detail</b></div>
+  <div class="mbody" id="mBody"></div>
+</div>
+
+<div id="overlay"><div class="box"><div class="spin"></div><div id="ovText">Memproses…</div></div></div>
+<div id="toast"></div>
+
+<script>
+/* ===================== UTIL ===================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function api(fn, ...args) {
+  return new Promise((resolve, reject) => {
+    if (window.google && google.script && google.script.run) {
+      google.script.run.withSuccessHandler(resolve)
+        .withFailureHandler(e => reject(e instanceof Error ? e : new Error(e && e.message ? e.message : String(e))))[fn](...args);
+    } else if (window.MOCK && MOCK[fn]) {
+      setTimeout(() => { try { resolve(MOCK[fn](...args)); } catch (e) { reject(e); } }, 350 + Math.random() * 400);
+    } else reject(new Error('Backend tidak tersedia'));
+  });
+}
+function busy(on, text) { $('#overlay').style.display = on ? 'grid' : 'none'; if (text) $('#ovText').textContent = text; }
+let toastT;
+function toast(msg, ms) { const t = $('#toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', ms || 2800); }
+function errMsg(e) { return (e && e.message ? e.message : String(e)).replace(/^Exception:\s*/, ''); }
+
+function compressImage(file, maxDim, quality) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      let w = img.naturalWidth, h = img.naturalHeight;
+      const s = Math.min(1, maxDim / Math.max(w, h));
+      w = Math.round(w * s); h = Math.round(h * s);
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Gagal membaca gambar')); };
+    img.src = url;
+  });
+}
+
+function badgeClass(text) {
+  const t = String(text || '');
+  if (t.startsWith('🔵') || t === 'Sudah Diantar') return 'b-info';
+  if (t.startsWith('🟣') || t === 'Terjadwal') return 'b-pur';
+  if (t === 'Belum Dijadwalkan') return 'b-warn';
+  if (t.startsWith('🟢') || t.startsWith('✅') || t === 'Diterima') return 'b-ok';
+  if (t.startsWith('🟡') || t === 'Menunggu PIC') return 'b-warn';
+  if (t.startsWith('🟠') || t === 'Diterima Sebagian') return 'b-org';
+  if (t.startsWith('🔴') || t.startsWith('❌') || t === 'Ditolak') return 'b-bad';
+  return 'b-info';
+}
+
+/* ===================== SIGNATURE PAD ===================== */
+function SigPad(canvas, onChange) {
+  let drawing = false, dirty = false, last = null;
+  const ctx = canvas.getContext('2d');
+  function fit() {
+    const r = canvas.getBoundingClientRect();
+    if (!r.width) return;
+    const dpr = window.devicePixelRatio || 1;
+    const W = Math.round(r.width * dpr), H = Math.round(r.height * dpr);
+    if (canvas.width === W && canvas.height === H && canvas.dataset.ready) return;
+    let snap = null;
+    if (dirty) { snap = document.createElement('canvas'); snap.width = canvas.width; snap.height = canvas.height; snap.getContext('2d').drawImage(canvas, 0, 0); }
+    canvas.width = W; canvas.height = H; canvas.dataset.ready = '1';
+    if (snap) ctx.drawImage(snap, 0, 0, W, H); // pertahankan tanda tangan saat layar diputar
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.lineWidth = 2.4; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0f2d52';
+    onChange && onChange();
+  }
+  const pos = e => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  canvas.addEventListener('pointerdown', e => { if (!canvas.dataset.ready) fit(); drawing = true; last = pos(e); canvas.setPointerCapture(e.pointerId); e.preventDefault(); });
+  canvas.addEventListener('pointermove', e => {
+    if (!drawing) return; const p = pos(e);
+    ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke(); last = p;
+    if (!dirty) { dirty = true; onChange && onChange(); }
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => canvas.addEventListener(ev, () => drawing = false));
+  return {
+    fit, isEmpty: () => !dirty,
+    clear() { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.restore(); dirty = false; onChange && onChange(); },
+    toDataURL() {
+      const c = document.createElement('canvas'); c.width = canvas.width; c.height = canvas.height;
+      const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(canvas, 0, 0);
+      return c.toDataURL('image/png');
+    }
+  };
+}
+
+/* ===================== STATE ===================== */
+const S = {
+  init: null,
+  spk: { fileId: null, scanning: false, text: '' },
+  auto: { spk: false, nopol: false, type: false },
+  parts: [],
+  pic: { name: null, pin: null },
+  uid: 0
+};
+let sigTek;
+
+/* ===================== TABS ===================== */
+document.querySelectorAll('nav.bottom button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+function showTab(name) {
+  document.querySelectorAll('nav.bottom button').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.id === 'tab-' + name));
+  $('#subTitle').textContent = { lapor: 'Teknisi: laporkan part bekas', pic: 'PIC: cek & terima part bekas', riwayat: 'Riwayat & indikator laporan' }[name];
+  window.scrollTo(0, 0);
+  if (name === 'lapor') setTimeout(() => sigTek.fit(), 30);
+  if (name === 'riwayat') loadHistory();
+  if (name === 'pic' && S.pic.name) loadPending();
+}
+
+/* ===================== INIT ===================== */
+async function init() {
+  sigTek = SigPad($('#sigTek'), refreshChecklist);
+  setTimeout(() => sigTek.fit(), 50);
+  window.addEventListener('resize', () => sigTek.fit());
+  addPart();
+  bindLapor();
+  bindPic();
+  bindRiwayat();
+  try {
+    busy(true, 'Memuat data…');
+    S.init = await api('getInitData');
+    $('#appName').textContent = S.init.appName || 'Laporan Part Bekas';
+    const opt = v => `<option>${esc(v)}</option>`;
+    $('#fTeknisi').insertAdjacentHTML('beforeend', S.init.teknisi.map(opt).join(''));
+    $('#fPic').insertAdjacentHTML('beforeend', S.init.pic.map(opt).join(''));
+    $('#lPic').insertAdjacentHTML('beforeend', S.init.pic.map(opt).join(''));
+    document.body.insertAdjacentHTML('beforeend', '<datalist id="asrList">' + (S.init.asuransi || []).map(t => `<option value="${esc(t)}">`).join('') + '</datalist>');
+    $('#typeList').innerHTML = S.init.types.map(t => `<option value="${esc(t)}">`).join('');
+    try { const last = localStorage.getItem('lpb_teknisi'); if (last && S.init.teknisi.includes(last)) $('#fTeknisi').value = last; } catch (e) {}
+  } catch (e) { toast('Gagal memuat: ' + errMsg(e), 5000); }
+  finally { busy(false); refreshChecklist(); }
+}
+
+/* ===================== LAPOR (TEKNISI) ===================== */
+function bindLapor() {
+  $('#spkCam').addEventListener('click', () => $('#spkFile').click());
+  $('#spkFile').addEventListener('change', onSpkPhoto);
+  ['#fTeknisi', '#fPic'].forEach(s => $(s).addEventListener('change', refreshChecklist));
+  [['#fSpk', 'spk'], ['#fNopol', 'nopol'], ['#fType', 'type']].forEach(([s, k]) => {
+    $(s).addEventListener('input', () => { S.auto[k] = false; setTag(k, $(s).value ? '' : 'manual'); $(s).classList.remove('auto'); refreshChecklist(); });
+  });
+  $('#fSpk').addEventListener('change', async () => {
+    const v = $('#fSpk').value.trim(); if (!v) return;
+    try { showDup(await api('checkSpk', v)); } catch (e) {}
+  });
+  $('#fNopol').addEventListener('blur', () => { $('#fNopol').value = formatNopol($('#fNopol').value); });
+  $('#addPart').addEventListener('click', () => { addPart(); setTimeout(() => { const l = $('#partList').lastElementChild; l && l.querySelector('input').focus(); }, 50); });
+  $('#clrTek').addEventListener('click', () => sigTek.clear());
+  $('#btnSubmit').addEventListener('click', submitReport);
+}
+
+function formatNopol(v) {
+  const s = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const m = s.match(/^([A-Z]{1,2})(\d{1,4})([A-Z]{0,3})$/);
+  return m ? [m[1], m[2], m[3]].filter(Boolean).join(' ') : String(v || '').toUpperCase().trim();
+}
+
+function setTag(k, mode) {
+  const el = $('#tag' + k.charAt(0).toUpperCase() + k.slice(1));
+  el.innerHTML = mode === 'auto' ? '<span class="autotag">⚡ otomatis</span>' : mode === 'manual' ? '<span class="manualtag">isi manual</span>' : '';
+}
+
+async function onSpkPhoto(ev) {
+  const file = ev.target.files[0]; ev.target.value = '';
+  if (!file) return;
+  S.spk.scanning = true; S.spk.fileId = null; refreshChecklist();
+  $('#spkStatus').innerHTML = '<div class="alert warn">⏳ Mengunggah & membaca SPK… (±5–15 detik)</div>';
+  try {
+    const dataUrl = await compressImage(file, 2000, 0.85);
+    $('#spkImg').src = dataUrl; $('#spkImg').classList.remove('hide'); $('#spkEmpty').classList.add('hide');
+    const r = await api('scanSpk', dataUrl);
+    S.spk.fileId = r.fileId; S.spk.text = r.text || '';
+    const fill = (k, sel, val) => {
+      if (val) { $(sel).value = val; $(sel).classList.add('auto'); S.auto[k] = true; setTag(k, 'auto'); }
+      else if (!$(sel).value) { $(sel).classList.remove('auto'); setTag(k, 'manual'); }
+    };
+    fill('spk', '#fSpk', r.spk); fill('nopol', '#fNopol', r.nopol); fill('type', '#fType', r.type);
+    const got = [r.spk, r.nopol, r.type].filter(Boolean).length;
+    let html = r.ocrError ? `<div class="alert bad">⚠️ ${esc(r.ocrError)}. Silakan isi manual.</div>`
+      : got === 3 ? '<div class="alert ok">✅ Foto SPK tersimpan. No. SPK, No. Polisi & Type terisi otomatis — mohon periksa kembali.</div>'
+      : `<div class="alert warn">📄 Foto SPK tersimpan. ${got}/3 data terbaca otomatis, lengkapi kolom yang bertanda <b>isi manual</b>.</div>`;
+    $('#spkStatus').innerHTML = html;
+    if (S.spk.text) { $('#ocrText').textContent = S.spk.text; $('#ocrBox').classList.remove('hide'); }
+    showDup(r.duplicate);
+  } catch (e) {
+    $('#spkStatus').innerHTML = `<div class="alert bad">❌ Gagal: ${esc(errMsg(e))}. Ketuk foto untuk mengulang.</div>`;
+  } finally { S.spk.scanning = false; refreshChecklist(); }
+}
+
+function showDup(d) {
+  $('#dupWarn').innerHTML = d ? `<div class="alert warn">⚠️ No. SPK ini sudah pernah dilaporkan (<b>${esc(d.id)}</b>, ${esc(d.tanggal)}, status: ${esc(d.status)}). Pastikan tidak dobel.</div>` : '';
+}
+
+function addPart() {
+  S.parts.push({ uid: ++S.uid, nama: '', nopart: '', qty: 1, kondisi: 'Rusak', dataUrl: null, fileId: null, uploading: false, error: '' });
+  renderParts();
+}
+
+function renderParts() {
+  const list = $('#partList');
+  list.innerHTML = S.parts.map((p, i) => `
+    <div class="part" data-uid="${p.uid}">
+      <div class="head"><span class="num">Part #${i + 1}</span>
+        <span>${partBadge(p)} ${S.parts.length > 1 ? `<button class="del" data-act="del">Hapus</button>` : ''}</span></div>
+      <label>Nama Part *</label>
+      <input data-k="nama" value="${esc(p.nama)}" placeholder="mis. Kampas rem depan">
+      <div class="row">
+        <div><label>No. Part</label><input data-k="nopart" value="${esc(p.nopart)}" placeholder="opsional"></div>
+        <div style="max-width:80px"><label>Qty</label><input data-k="qty" type="number" min="1" inputmode="numeric" value="${esc(p.qty)}"></div>
+        <div><label>Kondisi</label><select data-k="kondisi">${['Rusak', 'Aus', 'Bocor', 'Patah', 'Ganti Berkala', 'Lainnya'].map(o => `<option ${o === p.kondisi ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
+      </div>
+      <div class="pphoto">
+        ${p.dataUrl ? `<img class="thumb" src="${p.dataUrl}" alt="foto part">` : `<div class="thumb empty">📷</div>`}
+        <div style="flex:1">
+          <button class="btn ${p.dataUrl ? 'sec' : ''} sm" data-act="photo" style="width:100%">${p.dataUrl ? '🔄 Foto Ulang' : '📷 Foto Part *'}</button>
+          <div class="muted" style="margin-top:6px">${p.error ? '<span style="color:var(--bad)">' + esc(p.error) + '</span>' : 'Foto wajib untuk setiap part'}</div>
+        </div>
+      </div>
+      <input type="file" accept="image/*" capture="environment" class="hide" data-act="file">
+    </div>`).join('');
+  $('#partBadge').textContent = S.parts.length + ' part';
+  refreshChecklist();
+}
+
+function partBadge(p) {
+  if (p.uploading) return '<span class="badge b-warn">⏳ Mengunggah</span>';
+  if (p.fileId) return '<span class="badge b-ok">✔ Foto OK</span>';
+  if (p.error) return '<span class="badge b-bad">✖ Gagal</span>';
+  return '<span class="badge b-bad">Belum foto</span>';
+}
+
+$('#partList').addEventListener('input', e => {
+  const box = e.target.closest('.part'); if (!box || !e.target.dataset.k) return;
+  const p = S.parts.find(x => x.uid == box.dataset.uid); p[e.target.dataset.k] = e.target.value; refreshChecklist();
+});
+$('#partList').addEventListener('change', async e => {
+  const box = e.target.closest('.part'); if (!box) return;
+  const p = S.parts.find(x => x.uid == box.dataset.uid);
+  if (e.target.dataset.k) { p[e.target.dataset.k] = e.target.value; refreshChecklist(); return; }
+  if (e.target.dataset.act !== 'file') return;
+  const file = e.target.files[0]; if (!file) return;
+  try {
+    p.dataUrl = await compressImage(file, 1400, 0.8); p.fileId = null; p.uploading = true; p.error = ''; renderParts();
+    const r = await api('uploadImage', p.dataUrl, 'PART_' + (p.nama || 'tanpa_nama'));
+    p.fileId = r.fileId;
+  } catch (err) { p.error = 'Upload gagal: ' + errMsg(err); }
+  finally { p.uploading = false; renderParts(); }
+});
+$('#partList').addEventListener('click', e => {
+  const act = e.target.dataset.act; const box = e.target.closest('.part'); if (!act || !box) return;
+  const p = S.parts.find(x => x.uid == box.dataset.uid);
+  if (act === 'del') { S.parts = S.parts.filter(x => x !== p); renderParts(); }
+  if (act === 'photo') box.querySelector('input[type=file]').click();
+});
+
+function refreshChecklist() {
+  const parts = S.parts;
+  const fotoOk = parts.filter(p => p.fileId).length;
+  const namaOk = parts.length > 0 && parts.every(p => p.nama.trim());
+  const items = [
+    ['Teknisi & PIC dipilih', !!($('#fTeknisi').value && $('#fPic').value)],
+    ['Foto SPK tersimpan', !!S.spk.fileId],
+    ['No. SPK, No. Polisi & Type terisi', !!($('#fSpk').value.trim() && $('#fNopol').value.trim() && $('#fType').value.trim())],
+    ['Nama semua part terisi', namaOk],
+    [`Semua part sudah difoto (${fotoOk}/${parts.length})`, parts.length > 0 && fotoOk === parts.length],
+    ['Tanda tangan teknisi', sigTek ? !sigTek.isEmpty() : false]
+  ];
+  const done = items.filter(i => i[1]).length;
+  $('#checklist').innerHTML = items.map(([t, ok]) => `<li><span class="ck ${ok ? 'y' : 'n'}">${ok ? '✓' : '•'}</span>${esc(t)}</li>`).join('');
+  const pct = Math.round(done / items.length * 100);
+  $('#meterBar').style.width = pct + '%';
+  $('#meterBar').style.background = pct === 100 ? 'var(--ok)' : pct >= 50 ? 'var(--accent)' : 'var(--bad)';
+  $('#meterText').textContent = pct === 100 ? '100% lengkap — siap dikirim' : pct + '% lengkap';
+  const uploading = parts.some(p => p.uploading) || S.spk.scanning;
+  $('#btnSubmit').disabled = done !== items.length || uploading;
+}
+
+async function submitReport() {
+  const payload = {
+    teknisi: $('#fTeknisi').value, pic: $('#fPic').value,
+    spk: $('#fSpk').value.trim(), nopol: formatNopol($('#fNopol').value), type: $('#fType').value.trim(),
+    spkFileId: S.spk.fileId, ocrText: S.spk.text, catatan: $('#fCatatan').value.trim(),
+    parts: S.parts.map(p => ({ nama: p.nama.trim(), nopart: p.nopart.trim(), qty: Number(p.qty) || 1, kondisi: p.kondisi, fileId: p.fileId })),
+    ttdTeknisi: sigTek.toDataURL()
+  };
+  try {
+    busy(true, 'Menyimpan laporan ke spreadsheet…');
+    const r = await api('submitReport', payload);
+    try { localStorage.setItem('lpb_teknisi', payload.teknisi); } catch (e) {}
+    busy(false);
+    showSuccess(r, payload);
+    resetForm();
+  } catch (e) { busy(false); toast('❌ ' + errMsg(e), 5000); }
+}
+
+function resetForm() {
+  S.spk = { fileId: null, scanning: false, text: '' }; S.parts = [];
+  ['#fSpk', '#fNopol', '#fType', '#fCatatan'].forEach(s => { $(s).value = ''; $(s).classList.remove('auto'); });
+  ['spk', 'nopol', 'type'].forEach(k => setTag(k, ''));
+  $('#spkImg').classList.add('hide'); $('#spkEmpty').classList.remove('hide');
+  $('#spkStatus').innerHTML = ''; $('#dupWarn').innerHTML = ''; $('#ocrBox').classList.add('hide');
+  sigTek.clear(); addPart();
+}
+
+function showSuccess(r, p) {
+  openModal('Laporan Terkirim', `
+    <div class="card" style="text-align:center">
+      <div style="font-size:48px">✅</div>
+      <h2 style="margin:6px 0">Laporan tersimpan</h2>
+      <div class="muted">ID Laporan</div><div style="font-size:20px;font-weight:800;color:var(--navy)">${esc(r.id)}</div>
+      <div style="margin:10px 0"><span class="badge ${badgeClass(r.indikator)}">${esc(r.indikator)}</span></div>
+      <div class="kv" style="text-align:left;margin-top:10px">
+        <div>No. SPK</div><div>${esc(p.spk)}</div><div>No. Polisi</div><div>${esc(p.nopol)}</div>
+        <div>Type</div><div>${esc(p.type)}</div><div>Jumlah Part</div><div>${p.parts.length}</div><div>PIC</div><div>${esc(p.pic)}</div>
+      </div>
+      <p class="muted">Serahkan part fisik ke <b>${esc(p.pic)}</b>. PIC akan mengecek & menerima melalui menu <b>Serah Terima</b>.</p>
+      <button class="btn" onclick="closeModal()">Buat Laporan Baru</button>
+    </div>`);
+}
+
+/* ===================== PIC ===================== */
+function bindPic() {
+  $('#btnLogin').addEventListener('click', async () => {
+    const pic = $('#lPic').value, pin = $('#lPin').value;
+    if (!pic || !pin) return toast('Pilih PIC dan isi PIN');
+    try { busy(true, 'Memeriksa PIN…'); await api('loginPic', pic, pin);
+      S.pic = { name: pic, pin }; $('#picName').textContent = pic;
+      $('#picLogin').classList.add('hide'); $('#picArea').classList.remove('hide'); $('#lPin').value = '';
+      await loadPending();
+    } catch (e) { toast('❌ ' + errMsg(e)); } finally { busy(false); }
+  });
+  $('#btnLogout').addEventListener('click', () => { S.pic = { name: null, pin: null }; $('#picArea').classList.add('hide'); $('#picLogin').classList.remove('hide'); $('#pendPill').style.display = 'none'; });
+  $('#btnRefreshPic').addEventListener('click', loadPending);
+  $('#pendingList').addEventListener('click', e => { const it = e.target.closest('.item'); if (it) openHandover(it.dataset.id); });
+  $('#planList').addEventListener('click', e => { const it = e.target.closest('.item'); if (it) openPlan(it.dataset.id); });
+  $('#deliverList').addEventListener('click', e => { const it = e.target.closest('.item'); if (it) openDelivery(it.dataset.id); });
+}
+
+async function loadPending() {
+  $('#pendingList').innerHTML = '<div class="empty">Memuat…</div>';
+  $('#deliverList').innerHTML = '<div class="empty">Memuat…</div>'; $('#planList').innerHTML = '';
+  try {
+    const [list, deliver] = await Promise.all([api('getPending', S.pic.name, S.pic.pin), api('getToDeliver', S.pic.name, S.pic.pin)]);
+    const total = list.length + deliver.length;
+    $('#pendPill').textContent = total; $('#pendPill').style.display = total ? 'block' : 'none';
+    const toPlan = deliver.filter(r => r.statusAsuransi !== 'Terjadwal'), sched = deliver.filter(r => r.statusAsuransi === 'Terjadwal');
+    $('#cntPending').textContent = list.length; $('#cntPlan').textContent = toPlan.length; $('#cntDeliver').textContent = sched.length;
+    $('#pendingList').innerHTML = list.length ? list.map(itemHtml).join('') : '<div class="empty">🎉 Tidak ada part yang menunggu serah terima.</div>';
+    $('#planList').innerHTML = toPlan.length ? toPlan.map(itemHtml).join('') : '<div class="empty">Semua part yang diterima sudah punya planning.</div>';
+    $('#deliverList').innerHTML = sched.length ? sched.map(itemHtml).join('') : '<div class="empty">Tidak ada jadwal antar ke asuransi.</div>';
+  } catch (e) { $('#pendingList').innerHTML = `<div class="alert bad">${esc(errMsg(e))}</div>`; $('#deliverList').innerHTML = ''; }
+}
+
+/* ===================== ANTAR KE ASURANSI (PIC) ===================== */
+let DV = null;
+function isoDate(d) { const p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; }
+function todayStr() { return isoDate(new Date()); }
+function addDays(iso, n) { const [y, m, d] = iso.split('-').map(Number); return isoDate(new Date(y, m - 1, d + n)); }
+function dmy(iso) { if (!iso) return '-'; const [y, m, d] = iso.split('-'); return `${d}/${m}/${y}`; }
+function isoFromDmy(s) { const m = String(s || '').match(/^(\d{2})\/(\d{2})\/(\d{4})/); return m ? `${m[3]}-${m[2]}-${m[1]}` : ''; }
+function diffDays(isoA, isoB) { const u = s => { const [y, m, d] = s.split('-').map(Number); return Date.UTC(y, m - 1, d); }; return Math.round((u(isoB) - u(isoA)) / 86400000); }
+function ketepatanText(selisih) { return selisih < 0 ? `✅ Lebih Cepat ${-selisih} hari` : selisih === 0 ? '✅ Tepat Waktu' : `⚠️ Terlambat ${selisih} hari`; }
+function jadwalBadge(r) {
+  if (r.statusAsuransi !== 'Terjadwal' || r.sisaHari == null) return '';
+  const n = r.sisaHari;
+  if (n < 0) return `<span class="badge b-bad">⛔ Lewat jadwal ${-n} hari</span>`;
+  if (n === 0) return '<span class="badge b-org">📍 Hari ini</span>';
+  if (n === 1) return '<span class="badge b-warn">Besok</span>';
+  return `<span class="badge b-pur">H-${n}</span>`;
+}
+function partsCard(r) {
+  const ok = r.parts.filter(p => String(p.cek).startsWith('✔'));
+  return `<div class="card"><h3>📦 Part yang diantar (${ok.length})</h3>
+    ${ok.map(p => `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)"><span>#${p.no} ${esc(p.nama)}</span><span class="muted">Qty ${esc(p.qty)}</span></div>`).join('')}
+    ${ok.length < r.parts.length ? `<div class="alert warn">${r.parts.length - ok.length} part tidak sesuai saat serah terima dan tidak ikut diantar.</div>` : ''}</div>`;
+}
+
+/* LANGKAH 1: Tanggal PLANNING antar ke asuransi */
+async function openPlan(id) {
+  try {
+    busy(true, 'Membuka laporan…');
+    const r = await api('getReport', id);
+    const resched = r.statusAsuransi === 'Terjadwal';
+    const minIso = isoFromDmy(r.tglDiterima) || '';
+    const def = r.isoPlan || addDays(todayStr(), 1);
+    openModal(resched ? 'Ubah Planning' : 'Planning Antar ke Asuransi', `
+      ${headerCard(r)}
+      ${partsCard(r)}
+      <div class="card"><h3>🗓️ ${resched ? 'Ubah' : 'Buat'} Planning Antar</h3>
+        ${resched ? `<div class="alert warn">Planning saat ini: <b>${esc(r.tglPlan)}</b>. Perubahan tanggal dicatat sebagai <b>reschedule</b> di Catatan Pengantaran.</div>` : ''}
+        <label for="plAsr">Nama Asuransi *</label><input id="plAsr" list="asrList" placeholder="mis. Garda Oto" autocomplete="off" value="${esc(r.asuransi || '')}">
+        <label for="plKlaim">No. Klaim / No. Polis</label><input id="plKlaim" placeholder="opsional" autocomplete="off" value="${esc(r.noKlaim || '')}">
+        <label for="plTgl">Tanggal Planning Diantar ke Asuransi *</label><input id="plTgl" type="date" value="${def}" ${minIso ? `min="${minIso}"` : ''}>
+        <div class="muted" id="plInfo" style="margin-top:6px"></div>
+        <label for="plNote">${resched ? 'Alasan reschedule' : 'Catatan'}</label><textarea id="plNote" placeholder="${resched ? 'mis. menunggu jadwal surveyor' : 'opsional'}"></textarea>
+        <div style="height:12px"></div>
+        <button class="btn" id="plSave" style="background:#5b21b6">🗓️ Simpan Planning</button>
+      </div>`);
+    const info = () => {
+      const v = $('#plTgl').value; if (!v) { $('#plInfo').textContent = ''; return; }
+      const n = diffDays(todayStr(), v);
+      $('#plInfo').textContent = n === 0 ? 'Rencana antar: hari ini' : n > 0 ? `Rencana antar: ${n} hari lagi` : `⚠️ Tanggal sudah lewat ${-n} hari`;
+    };
+    $('#plTgl').oninput = info; info();
+    $('#plSave').onclick = async () => {
+      const asuransi = $('#plAsr').value.trim(), tanggalPlan = $('#plTgl').value;
+      if (!asuransi) { toast('Isi nama asuransi'); $('#plAsr').focus(); return; }
+      if (!tanggalPlan) { toast('Isi tanggal planning'); return; }
+      if (minIso && tanggalPlan < minIso) { toast('Planning tidak boleh sebelum tanggal diterima PIC (' + dmy(minIso) + ')'); return; }
+      try {
+        busy(true, 'Menyimpan planning…');
+        const res = await api('planDelivery', { id: r.id, pic: S.pic.name, pin: S.pic.pin, asuransi,
+          noKlaim: $('#plKlaim').value.trim(), tanggalPlan, catatan: $('#plNote').value.trim() });
+        busy(false); closeModal();
+        toast(`🟣 ${res.id}: planning ${dmy(tanggalPlan)}${res.reschedule ? ' (reschedule)' : ''}`, 3500); loadPending();
+      } catch (e) { busy(false); toast('❌ ' + errMsg(e), 5000); }
+    };
+    loadImages();
+  } catch (e) { toast('❌ ' + errMsg(e)); } finally { busy(false); }
+}
+
+/* LANGKAH 2: Tanggal AKTUAL antar ke asuransi */
+async function openDelivery(id) {
+  try {
+    busy(true, 'Membuka laporan…');
+    const r = await api('getReport', id);
+    DV = { r, buktiFileId: null, uploading: false };
+    const minIso = isoFromDmy(r.tglDiterima) || '';
+    openModal('Catat Aktual Antar', `
+      ${headerCard(r)}
+      <div class="card"><h3>🗓️ Planning <span style="margin-left:auto">${jadwalBadge(r)}</span></h3>
+        <div class="kv"><div>Asuransi</div><div><b>${esc(r.asuransi)}</b></div><div>No. Klaim</div><div>${esc(r.noKlaim || '-')}</div>
+          <div>Tgl Planning</div><div><b>${esc(r.tglPlan)}</b></div></div>
+        <div style="height:10px"></div><button class="btn sec sm" id="dvResched">✏️ Ubah Planning / Reschedule</button>
+      </div>
+      ${partsCard(r)}
+      <div class="card"><h3>🚚 Tanggal Aktual Diantar</h3>
+        <label for="dvTgl">Tanggal Aktual Diantar ke Asuransi *</label>
+        <input id="dvTgl" type="date" value="${todayStr()}" max="${todayStr()}" ${minIso ? `min="${minIso}"` : ''}>
+        <div class="datebox"><div><div class="l">Planning</div><div class="v">${esc(r.tglPlan)}</div></div>
+          <div><div class="l">Aktual</div><div class="v" id="dvAkt">-</div></div></div>
+        <div id="dvKet" style="margin-bottom:6px"></div>
+        <label for="dvPenerima">Nama Penerima di Asuransi</label><input id="dvPenerima" placeholder="opsional" autocomplete="off">
+        <label>Foto Bukti Tanda Terima Asuransi</label>
+        <div class="pphoto"><div class="thumb empty" id="dvThumb">📷</div>
+          <div style="flex:1"><button class="btn sec sm" id="dvFotoBtn" style="width:100%">📷 Foto Bukti (opsional)</button><div class="muted" id="dvFotoInfo" style="margin-top:6px">Tanda terima / BAST dari asuransi</div></div></div>
+        <input type="file" id="dvFile" accept="image/*" capture="environment" class="hide">
+        <label for="dvNote">Catatan</label><textarea id="dvNote" placeholder="opsional"></textarea>
+        <div style="height:12px"></div>
+        <button class="btn" id="dvSave">💾 Simpan Tanggal Aktual</button>
+        <div class="muted" style="margin-top:8px;text-align:center">Diantar oleh: <b>${esc(S.pic.name)}</b></div>
+      </div>`);
+    const ket = () => {
+      const v = $('#dvTgl').value; $('#dvAkt').textContent = v ? dmy(v) : '-';
+      if (!v || !r.isoPlan) { $('#dvKet').innerHTML = ''; return; }
+      const t = ketepatanText(diffDays(r.isoPlan, v));
+      $('#dvKet').innerHTML = `<span class="badge ${t.startsWith('✅') ? 'b-ok' : 'b-bad'}">${t}</span>`;
+    };
+    $('#dvTgl').oninput = ket; ket();
+    $('#dvResched').onclick = () => { closeModal(); openPlan(r.id); };
+    $('#dvFotoBtn').onclick = () => $('#dvFile').click();
+    $('#dvFile').onchange = async e => {
+      const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+      DV.uploading = true; DV.buktiFileId = null; $('#dvSave').disabled = true; $('#dvFotoInfo').textContent = '⏳ Mengunggah…';
+      try {
+        const d = await compressImage(f, 1600, 0.8);
+        $('#dvThumb').outerHTML = `<img class="thumb" id="dvThumb" src="${d}" alt="bukti">`;
+        DV.buktiFileId = (await api('uploadImage', d, 'BUKTI_ASURANSI')).fileId;
+        $('#dvFotoInfo').innerHTML = '<span class="badge b-ok">✔ Foto bukti OK</span>'; $('#dvFotoBtn').textContent = '🔄 Foto Ulang';
+      } catch (err) { $('#dvFotoInfo').innerHTML = `<span style="color:var(--bad)">Upload gagal: ${esc(errMsg(err))}</span>`; }
+      finally { DV.uploading = false; $('#dvSave').disabled = false; }
+    };
+    $('#dvSave').onclick = saveDelivery;
+    loadImages();
+  } catch (e) { toast('❌ ' + errMsg(e)); } finally { busy(false); }
+}
+
+async function saveDelivery() {
+  const tanggal = $('#dvTgl').value, minIso = isoFromDmy(DV.r.tglDiterima);
+  if (!tanggal) { toast('Isi tanggal aktual'); $('#dvTgl').focus(); return; }
+  if (tanggal > todayStr()) { toast('Tanggal aktual tidak boleh melebihi hari ini'); return; }
+  if (minIso && tanggal < minIso) { toast('Tanggal aktual tidak boleh sebelum tanggal diterima PIC'); return; }
+  try {
+    busy(true, 'Menyimpan tanggal aktual…');
+    const r = await api('deliverToInsurance', { id: DV.r.id, pic: S.pic.name, pin: S.pic.pin, tanggal,
+      penerima: $('#dvPenerima').value.trim(), catatan: $('#dvNote').value.trim(), buktiFileId: DV.buktiFileId });
+    busy(false); closeModal(); toast(`🔵 ${r.id}: diantar ${dmy(tanggal)} — ${r.ketepatan}`, 4000); loadPending();
+  } catch (e) { busy(false); toast('❌ ' + errMsg(e), 5000); }
+}
+
+function shortInd(r) {
+  if (r.statusAsuransi === 'Sudah Diantar') return '🔵 Diantar ke Asuransi';
+  if (r.statusAsuransi === 'Terjadwal') return '🟣 Terjadwal Antar';
+  return String(r.indikator).split(' - ')[0].replace(/ Serah Terima PIC$/, ' PIC');
+}
+function itemHtml(r) {
+  return `<div class="item" data-id="${esc(r.id)}">
+    <div class="t"><div><div class="id">${esc(r.nopol)} · ${esc(r.type)}</div><div class="meta">SPK ${esc(r.spk)} · ${esc(r.id)}</div></div>
+      <span class="badge ${badgeClass(r.indikator)}" style="white-space:normal;text-align:right;max-width:52%">${esc(shortInd(r))}</span></div>
+    <div class="meta">👷 ${esc(r.teknisi)} → 🧑‍💼 ${esc(r.pic)} · ${esc(r.tanggal)}</div>
+    <div class="meta">📷 ${esc(r.indFoto)} · 📦 Diterima ${esc(r.diterima || 0)}/${esc(r.jumlah)}</div>
+    ${r.statusAsuransi === 'Sudah Diantar' ? `<div class="meta">🚚 <b>${esc(r.asuransi)}</b> · Plan ${esc(r.tglPlan)} · Aktual <b>${esc(r.tglAktual)}</b>
+        <span class="badge ${String(r.ketepatan).startsWith('✅') ? 'b-ok' : 'b-bad'}">${esc(r.ketepatan)}</span></div>`
+      : r.statusAsuransi === 'Terjadwal' ? `<div class="meta">🗓️ Plan antar <b>${esc(r.tglPlan)}</b> ke ${esc(r.asuransi)} ${jadwalBadge(r)}</div>`
+      : r.statusAsuransi === 'Belum Dijadwalkan' ? `<div class="meta">🗓️ <span class="badge b-warn">Belum ada planning antar ke asuransi</span></div>` : ''}
+  </div>`;
+}
+
+let HO = null; // state serah terima
+async function openHandover(id) {
+  try {
+    busy(true, 'Membuka laporan…');
+    const r = await api('getReport', id);
+    HO = { r, checks: {}, pad: null };
+    openModal('Serah Terima ' + r.id, `
+      ${headerCard(r)}
+      <div class="card"><h3>📄 Foto SPK</h3>${imgBox(r.spkFotoId)}</div>
+      <div class="card">
+        <h3>📦 Cek Part Bekas <span class="badge b-info" id="hoCount" style="margin-left:auto"></span></h3>
+        <div class="meter"><i id="hoBar" style="width:0%"></i></div>
+        <p class="muted">Cocokkan foto dengan part fisik yang diserahkan, lalu tandai <b>Sesuai</b> / <b>Tidak</b>.</p>
+        ${r.parts.map(p => `
+          <div class="pcheck" data-no="${p.no}">
+            <div class="t" style="display:flex;justify-content:space-between"><b>#${p.no} ${esc(p.nama)}</b><span class="muted">Qty ${esc(p.qty)} · ${esc(p.kondisi)}</span></div>
+            ${p.nopart ? `<div class="muted">No. Part: ${esc(p.nopart)}</div>` : ''}
+            ${imgBox(p.fotoId)}
+            <div class="seg"><button class="btn sec sm" data-v="yes">✔ Sesuai</button><button class="btn sec sm" data-v="no">✖ Tidak Sesuai</button></div>
+            <input class="hide" data-note placeholder="Catatan (wajib jika tidak sesuai)" style="margin-top:8px">
+          </div>`).join('')}
+      </div>
+      <div class="card">
+        <h3>✍️ Serah Terima PIC</h3>
+        <label>Catatan PIC</label><textarea id="hoNote" placeholder="opsional, wajib jika menolak"></textarea>
+        <label>Tanda tangan PIC (diterima oleh)</label>
+        <canvas id="sigPic" class="sig"></canvas>
+        <div class="sigbar"><span>Diserahkan: ${esc(r.teknisi)} → Diterima: ${esc(S.pic.name)}</span><button class="btn sec sm" id="clrPic" type="button">Hapus</button></div>
+        <div style="height:12px"></div>
+        <button class="btn ok" id="btnTerima" disabled>🤝 Terima Part</button>
+        <div style="height:8px"></div>
+        <button class="btn bad" id="btnTolak">Tolak Laporan</button>
+      </div>`);
+    loadImages();
+    HO.pad = SigPad($('#sigPic'), hoRefresh);
+    setTimeout(() => HO.pad.fit(), 60);
+    $('#clrPic').onclick = () => HO.pad.clear();
+    $('#mBody').querySelectorAll('.pcheck').forEach(box => {
+      box.querySelectorAll('[data-v]').forEach(b => b.onclick = () => {
+        const v = b.dataset.v === 'yes'; HO.checks[box.dataset.no] = v;
+        box.classList.toggle('yes', v); box.classList.toggle('no', !v);
+        box.querySelector('[data-v=yes]').className = 'btn sm ' + (v ? 'on-yes' : 'sec');
+        box.querySelector('[data-v=no]').className = 'btn sm ' + (!v ? 'on-no' : 'sec');
+        box.querySelector('[data-note]').classList.toggle('hide', v);
+        hoRefresh();
+      });
+      box.querySelector('[data-note]').oninput = hoRefresh;
+    });
+    $('#btnTerima').onclick = () => finishHandover('terima');
+    $('#btnTolak').onclick = () => finishHandover('tolak');
+    hoRefresh();
+  } catch (e) { toast('❌ ' + errMsg(e)); } finally { busy(false); }
+}
+
+function hoRefresh() {
+  if (!HO) return;
+  const n = HO.r.parts.length, checked = Object.keys(HO.checks).length, ok = Object.values(HO.checks).filter(Boolean).length;
+  $('#hoCount').textContent = `${checked}/${n} dicek · ${ok} sesuai`;
+  $('#hoBar').style.width = Math.round(checked / n * 100) + '%';
+  const notesOk = [...$('#mBody').querySelectorAll('.pcheck.no [data-note]')].every(i => i.value.trim());
+  const ready = checked === n && HO.pad && !HO.pad.isEmpty() && notesOk;
+  $('#btnTerima').disabled = !ready;
+  $('#btnTerima').textContent = checked === n && ok < n ? `🤝 Terima Sebagian (${ok}/${n})` : '🤝 Terima Semua Part';
+}
+
+async function finishHandover(decision) {
+  const note = $('#hoNote').value.trim();
+  if (decision === 'tolak' && !note) { toast('Isi alasan penolakan di Catatan PIC'); $('#hoNote').focus(); return; }
+  if (decision === 'tolak' && !confirm('Tolak laporan ini? Teknisi perlu membuat laporan ulang.')) return;
+  const checks = [...$('#mBody').querySelectorAll('.pcheck')].map(b => ({
+    no: Number(b.dataset.no), sesuai: HO.checks[b.dataset.no] === true, catatan: b.querySelector('[data-note]').value.trim()
+  }));
+  try {
+    busy(true, 'Menyimpan serah terima…');
+    const r = await api('confirmHandover', { id: HO.r.id, pic: S.pic.name, pin: S.pic.pin, decision, checks, catatan: note,
+      ttdPic: HO.pad.isEmpty() ? '' : HO.pad.toDataURL() });
+    busy(false); closeModal();
+    toast((r.status === 'Diterima' ? '✅ ' : r.status === 'Ditolak' ? '⛔ ' : '🟠 ') + r.id + ': ' + r.status, 3500);
+    loadPending();
+  } catch (e) { busy(false); toast('❌ ' + errMsg(e), 5000); }
+}
+
+/* ===================== RIWAYAT ===================== */
+let qTimer;
+function bindRiwayat() {
+  $('#qSearch').addEventListener('input', () => { clearTimeout(qTimer); qTimer = setTimeout(loadHistory, 400); });
+  $('#histList').addEventListener('click', e => { const it = e.target.closest('.item'); if (it) openDetail(it.dataset.id); });
+}
+async function loadHistory() {
+  $('#histList').innerHTML = '<div class="empty">Memuat…</div>';
+  try {
+    const d = await api('getDashboard', $('#qSearch').value);
+    const c = d.counts;
+    $('#stats').innerHTML = [['Total Laporan', c.total, '', ''], ['Menunggu PIC', c.menunggu, 'var(--warn)', ''], ['Ditolak', c.ditolak, 'var(--bad)', ''],
+      ['Belum Planning', c.belumJadwal, 'var(--org)', ''],
+      ['Terjadwal', c.terjadwal, '#5b21b6', c.lewatJadwal ? `<small style="color:var(--bad)">${c.lewatJadwal} lewat jadwal</small>` : '<small>&nbsp;</small>'],
+      ['Sudah Diantar', c.diantar, '#1d4f8f', `<small>${c.tepatWaktu} tepat · <span style="color:${c.terlambat ? 'var(--bad)' : 'inherit'}">${c.terlambat} telat</span></small>`]]
+      .map(([l, v, col, sub]) => `<div class="stat"><b style="color:${col || 'var(--navy)'}">${v}</b><span>${l}</span>${sub}</div>`).join('');
+    $('#histList').innerHTML = d.list.length ? d.list.map(itemHtml).join('') : '<div class="empty">Belum ada laporan.</div>';
+  } catch (e) { $('#histList').innerHTML = `<div class="alert bad">${esc(errMsg(e))}</div>`; }
+}
+async function openDetail(id) {
+  try {
+    busy(true, 'Membuka…');
+    const r = await api('getReport', id);
+    openModal(r.id, `
+      ${headerCard(r)}
+      <div class="card"><h3>📄 Foto SPK</h3>${imgBox(r.spkFotoId)}</div>
+      <div class="card"><h3>📦 Part Bekas (${r.parts.length})</h3>
+        ${r.parts.map(p => `<div class="pcheck ${String(p.cek).startsWith('✔') ? 'yes' : String(p.cek).startsWith('✖') ? 'no' : ''}">
+          <div style="display:flex;justify-content:space-between;gap:8px"><b>#${p.no} ${esc(p.nama)}</b><span class="badge ${String(p.cek).startsWith('✔') ? 'b-ok' : String(p.cek).startsWith('✖') ? 'b-bad' : 'b-warn'}">${esc(p.cek)}</span></div>
+          <div class="muted">Qty ${esc(p.qty)} · ${esc(p.kondisi)}${p.nopart ? ' · No. Part ' + esc(p.nopart) : ''}${p.catatan ? ' · Catatan: ' + esc(p.catatan) : ''}</div>
+          ${imgBox(p.fotoId)}</div>`).join('')}
+      </div>
+      <div class="card"><h3>🤝 Serah Terima</h3>
+        <div class="kv"><div>Diserahkan</div><div>${esc(r.teknisi)} · ${esc(r.tanggal)}</div>
+          <div>Diterima</div><div>${esc(r.diterimaOleh || '-')} ${r.tglDiterima ? '· ' + esc(r.tglDiterima) : ''}</div>
+          <div>Catatan Teknisi</div><div>${esc(r.catatanTeknisi || '-')}</div><div>Catatan PIC</div><div>${esc(r.catatanPic || '-')}</div></div>
+        <div class="row" style="margin-top:10px">
+          <div><div class="muted">TTD Teknisi</div>${imgBox(r.ttdTeknisiId)}</div>
+          <div><div class="muted">TTD PIC</div>${imgBox(r.ttdPicId)}</div>
+        </div>
+      </div>
+      ${r.statusAsuransi && r.statusAsuransi !== '-' ? `<div class="card"><h3>🚚 Pengantaran ke Asuransi <span class="badge ${badgeClass(r.statusAsuransi)}" style="margin-left:auto">${esc(r.statusAsuransi)}</span></h3>
+        ${r.statusAsuransi === 'Belum Dijadwalkan' ? `<div class="muted">Part sudah diterima PIC, menunggu planning antar ke asuransi oleh ${esc(r.diterimaOleh)}.</div>` : `
+          <div class="datebox"><div><div class="l">Tgl Planning</div><div class="v">${esc(r.tglPlan || '-')}</div></div>
+            <div><div class="l">Tgl Aktual</div><div class="v">${esc(r.tglAktual || '-')}</div></div></div>
+          ${r.statusAsuransi === 'Sudah Diantar' ? `<div style="margin-bottom:8px"><span class="badge ${String(r.ketepatan).startsWith('✅') ? 'b-ok' : 'b-bad'}">${esc(r.ketepatan)}</span></div>` : `<div style="margin-bottom:8px">${jadwalBadge(r)}</div>`}
+          <div class="kv"><div>Asuransi</div><div>${esc(r.asuransi)}</div><div>No. Klaim</div><div>${esc(r.noKlaim || '-')}</div>
+            <div>Diantar Oleh</div><div>${esc(r.diantarOleh || '-')}</div><div>Penerima</div><div>${esc(r.penerimaAsuransi || '-')}</div>
+            <div>Catatan</div><div>${esc(r.catatanAsuransi || '-')}</div></div>
+          ${r.statusAsuransi === 'Sudah Diantar' ? `<div class="muted" style="margin-top:8px">Bukti tanda terima</div>${imgBox(r.buktiAsuransiId)}` : ''}`}
+      </div>` : ''}`);
+    loadImages();
+  } catch (e) { toast('❌ ' + errMsg(e)); } finally { busy(false); }
+}
+
+/* ===================== SHARED VIEW ===================== */
+function headerCard(r) {
+  return `<div class="card">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:10px">
+      <div><div style="font-size:18px;font-weight:800;color:var(--navy)">${esc(r.nopol)}</div><div class="muted">${esc(r.type)}</div></div>
+      <span class="badge ${badgeClass(r.status)}">${esc(r.status)}</span></div>
+    <div class="kv"><div>ID</div><div>${esc(r.id)}</div><div>No. SPK</div><div>${esc(r.spk)}</div>
+      <div>Teknisi</div><div>${esc(r.teknisi)}</div><div>PIC</div><div>${esc(r.pic)}</div><div>Tanggal</div><div>${esc(r.tanggal)}</div>
+      <div>Foto</div><div><span class="badge ${badgeClass(r.indFoto)}">${esc(r.indFoto)}</span></div>
+      <div>Indikator</div><div><span class="badge ${badgeClass(r.indikator)}" style="white-space:normal">${esc(r.indikator)}</span></div></div>
+  </div>`;
+}
+function imgBox(id) { return id ? `<div class="imgbox" data-img="${esc(id)}">memuat foto…</div>` : '<div class="imgbox">— tidak ada —</div>'; }
+const imgCache = {};
+function loadImages() {
+  document.querySelectorAll('#mBody [data-img]').forEach(async el => {
+    const id = el.dataset.img;
+    try { const src = imgCache[id] || (imgCache[id] = await api('getImage', id)); el.innerHTML = `<img src="${src}" alt="foto">`; }
+    catch (e) { el.textContent = 'gagal memuat foto'; }
+  });
+}
+function openModal(title, html) { $('#mTitle').textContent = title; $('#mBody').innerHTML = html; $('#modal').style.display = 'block'; $('#modal').scrollTop = 0; }
+function closeModal() { $('#modal').style.display = 'none'; $('#mBody').innerHTML = ''; HO = null; }
+$('#mClose').addEventListener('click', closeModal);
+
+init();
+</script>
+</body>
+</html>
