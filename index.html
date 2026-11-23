@@ -134,12 +134,12 @@
     </div>
     <input type="file" id="spkFile" accept="image/*" capture="environment" class="hide">
     <div id="spkStatus"></div>
-    <label for="fSpk">No. SPK <span id="tagSpk"></span></label>
+    <label for="fSpk">No. SPK / No. Klaim / No. Ticket <span id="tagSpk"></span></label>
     <input id="fSpk" placeholder="Terisi otomatis dari foto SPK" autocomplete="off">
     <div class="row">
       <div><label for="fNopol">No. Polisi <span id="tagNopol"></span></label>
         <input id="fNopol" placeholder="B 1234 XYZ" autocomplete="off" style="text-transform:uppercase"></div>
-      <div><label for="fType">Type Mobil <span id="tagType"></span></label>
+      <div><label for="fType">Tipe / Model Kendaraan <span id="tagType"></span></label>
         <input id="fType" list="typeList" placeholder="Avanza" autocomplete="off"><datalist id="typeList"></datalist></div>
     </div>
     <div id="dupWarn"></div>
@@ -201,7 +201,7 @@
 <section id="tab-riwayat" class="tab">
   <div class="stats" id="stats"></div>
   <div class="card" style="padding:10px">
-    <input id="qSearch" placeholder="🔎 Cari SPK / No. Polisi / teknisi / asuransi / klaim">
+    <input id="qSearch" placeholder="🔎 Cari No. SPK/Klaim/Ticket, No. Polisi, teknisi, asuransi">
   </div>
   <div id="histList"></div>
 </section>
@@ -499,7 +499,7 @@ function refreshChecklist() {
   const items = [
     ['Teknisi & PIC dipilih', !!($('#fTeknisi').value && $('#fPic').value)],
     ['Foto SPK tersimpan', !!S.spk.fileId],
-    ['No. SPK, No. Polisi & Type terisi', !!($('#fSpk').value.trim() && $('#fNopol').value.trim() && $('#fType').value.trim())],
+    ['No. SPK/Klaim, No. Polisi & Tipe Kendaraan terisi', !!($('#fSpk').value.trim() && $('#fNopol').value.trim() && $('#fType').value.trim())],
     ['Nama semua part terisi', namaOk],
     [`Semua part sudah difoto (${fotoOk}/${parts.length})`, parts.length > 0 && fotoOk === parts.length],
     ['Tanda tangan teknisi', sigTek ? !sigTek.isEmpty() : false]
@@ -628,7 +628,7 @@ async function openPlan(id) {
       <div class="card"><h3>🗓️ ${resched ? 'Ubah' : 'Buat'} Planning Antar</h3>
         ${resched ? `<div class="alert warn">Planning saat ini: <b>${esc(r.tglPlan)}</b>. Perubahan tanggal dicatat sebagai <b>reschedule</b> di Catatan Pengantaran.</div>` : ''}
         <label for="plAsr">Nama Asuransi *</label><input id="plAsr" list="asrList" placeholder="mis. Garda Oto" autocomplete="off" value="${esc(r.asuransi || '')}">
-        <label for="plKlaim">No. Klaim / No. Polis</label><input id="plKlaim" placeholder="opsional" autocomplete="off" value="${esc(r.noKlaim || '')}">
+        <label for="plKlaim">No. Klaim <span class="autotag">= No. SPK</span></label><input id="plKlaim" autocomplete="off" value="${esc(r.noKlaim || r.spk || '')}">
         <label for="plTgl">Tanggal Planning Diantar ke Asuransi *</label><input id="plTgl" type="date" value="${def}" ${minIso ? `min="${minIso}"` : ''}>
         <div class="muted" id="plInfo" style="margin-top:6px"></div>
         <label for="plNote">${resched ? 'Alasan reschedule' : 'Catatan'}</label><textarea id="plNote" placeholder="${resched ? 'mis. menunggu jadwal surveyor' : 'opsional'}"></textarea>
@@ -888,7 +888,7 @@ function headerCard(r) {
     <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:10px">
       <div><div style="font-size:18px;font-weight:800;color:var(--navy)">${esc(r.nopol)}</div><div class="muted">${esc(r.type)}</div></div>
       <span class="badge ${badgeClass(r.status)}">${esc(r.status)}</span></div>
-    <div class="kv"><div>ID</div><div>${esc(r.id)}</div><div>No. SPK</div><div>${esc(r.spk)}</div>
+    <div class="kv"><div>ID</div><div>${esc(r.id)}</div><div>No. SPK / Klaim</div><div>${esc(r.spk)}</div>
       <div>Teknisi</div><div>${esc(r.teknisi)}</div><div>PIC</div><div>${esc(r.pic)}</div><div>Tanggal</div><div>${esc(r.tanggal)}</div>
       <div>Foto</div><div><span class="badge ${badgeClass(r.indFoto)}">${esc(r.indFoto)}</span></div>
       <div>Indikator</div><div><span class="badge ${badgeClass(r.indikator)}" style="white-space:normal">${esc(r.indikator)}</span></div></div>
